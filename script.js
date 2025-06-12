@@ -2521,18 +2521,22 @@ window.onload = function () {
   });
 
   document.getElementById("resetButton").addEventListener("click", function () {
-    localStorage.clear();
+   const summitState = summitAccess;
+localStorage.clear();
+setSummitAccess(summitState);
+
     location.reload();
   });
 
   // Upgrade modal
-  document.getElementById("upgradeNowBtn").addEventListener("click", function () {
-    setSummitAccess(true);
-    document.getElementById("upgradeModal").style.display = "none";
-    showToast("Summit Access unlocked!");
-    updateSecondWindState();
-    location.reload();
-  });
+ document.getElementById("upgradeNowBtn").addEventListener("click", function () {
+  setSummitAccess(true);
+  localStorage.removeItem("used-second-wind"); // reset usage for today
+  document.getElementById("upgradeModal").style.display = "none";
+  showToast("Summit Access unlocked!");
+  updateSecondWindState();
+});
+
 
   document.getElementById("cancelUpgradeBtn").addEventListener("click", function () {
     document.getElementById("upgradeModal").style.display = "none";
