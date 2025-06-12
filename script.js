@@ -2460,9 +2460,17 @@ function showPrompt() {
 }
 
 function getTodaysPrompt() {
-  // Replace this with actual logic for prompt by day
-  return { text: "What did you learn today?" };
+  const todayKey = "rangebook-todays-prompt";
+  const stored = localStorage.getItem(todayKey);
+  if (stored) return JSON.parse(stored);
+
+  const month = new Date().getMonth() + 1;
+  const prompts = promptsByMonth[month] || [];
+  const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+  localStorage.setItem(todayKey, JSON.stringify(randomPrompt));
+  return randomPrompt;
 }
+
 
 function showToast(message) {
   const toast = document.getElementById("toast");
