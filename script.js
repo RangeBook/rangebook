@@ -2429,7 +2429,20 @@ window.promptsByMonth = promptsByMonth;
 
 const isDevMode = true;
 let summitAccess = localStorage.getItem("rangebook-summit-access") === "true";
-let usedSecondWind = localStorage.getItem("used-second-wind") === new Date().toISOString().split('T')[0];
+let usedSecondWindCount = parseInt(localStorage.getItem("used-second-wind-count")) || 0;
+const MAX_SECOND_WINDS = 5;
+
+// Dummy prompt pool – replace with actual logic later
+const promptPool = [
+  "Where did I stick to a difficult routine this week?",
+  "What task have I been avoiding, and why?",
+  "What does discipline mean to me?",
+  "How have I held myself accountable lately?",
+  "What would make tomorrow better than today?",
+  "What did I learn about myself recently?",
+  "How have I practiced discipline today?",
+  "What decision tested my self-control?"
+];
 
 function setSummitAccess(enabled) {
   summitAccess = enabled;
@@ -2438,39 +2451,29 @@ function setSummitAccess(enabled) {
 
 function updateSecondWindState() {
   const btn = document.getElementById("secondPromptBtn");
-  const today = new Date().toISOString().split('T')[0];
-  const usedToday = localStorage.getItem("used-second-wind") === today;
-
   if (!summitAccess) {
     btn.textContent = "Second Wind (Upgrade Required)";
     btn.disabled = true;
-  } else if (usedToday) {
+  } else if (usedSecondWindCount >= MAX_SECOND_WINDS) {
     btn.textContent = "Second Wind (0 left)";
     btn.disabled = true;
   } else {
-    btn.textContent = "Second Wind (1 left)";
+    const remaining = MAX_SECOND_WINDS - usedSecondWindCount;
+    btn.textContent = `Second Wind (${remaining} left)`;
     btn.disabled = false;
   }
 }
 
+function getRandomPrompt(exclude = []) {
+  const available = promptPool.filter(p => !exclude.includes(p));
+  return available.length > 0 ? available[Math.floor(Math.random() * available.length)] : promptPool[0];
+}
+
 function showPrompt() {
-  const prompt = getTodaysPrompt();
-  document.getElementById("promptText").textContent = prompt.text;
-  document.getElementById("promptText").dataset.currentPrompt = prompt.text;
+  const prompt = getRandomPrompt();
+  document.getElementById("promptText").textContent = prompt;
+  document.getElementById("promptText").dataset.currentPrompt = prompt;
 }
-
-function getTodaysPrompt() {
-  const todayKey = "rangebook-todays-prompt";
-  const stored = localStorage.getItem(todayKey);
-  if (stored) return JSON.parse(stored);
-
-  const month = new Date().getMonth() + 1;
-  const prompts = promptsByMonth[month] || [];
-  const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
-  localStorage.setItem(todayKey, JSON.stringify(randomPrompt));
-  return randomPrompt;
-}
-
 
 function showToast(message) {
   const toast = document.getElementById("toast");
@@ -2497,7 +2500,6 @@ window.onload = function () {
     if (resetBtn) resetBtn.style.display = "inline-block";
   }
 
-  // Reminder Time Setup
   const savedTime = localStorage.getItem("rangebook-reminder-time");
   if (savedTime) {
     document.getElementById("reminderTime").value = savedTime;
@@ -2510,10 +2512,13 @@ window.onload = function () {
   });
 
   document.getElementById("secondPromptBtn").addEventListener("click", function () {
-    if (summitAccess && !usedSecondWind) {
-      const newPrompt = { text: "What would make tomorrow better than today?" };
-      document.getElementById("promptText").textContent = newPrompt.text;
-      localStorage.setItem("used-second-wind", new Date().toISOString().split('T')[0]);
+    if (summitAccess && usedSecondWindCount < MAX_SECOND_WINDS) {
+      const current = document.getElementById("promptText").dataset.currentPrompt;
+      const newPrompt = getRandomPrompt([current]);
+      document.getElementById("promptText").textContent = newPrompt;
+      document.getElementById("promptText").dataset.currentPrompt = newPrompt;
+      usedSecondWindCount++;
+      localStorage.setItem("used-second-wind-count", usedSecondWindCount);
       updateSecondWindState();
     } else {
       showToast("Second Wind is unavailable.");
@@ -2521,22 +2526,20 @@ window.onload = function () {
   });
 
   document.getElementById("resetButton").addEventListener("click", function () {
-   const summitState = summitAccess;
-localStorage.clear();
-setSummitAccess(summitState);
-
+    localStorage.clear();
+    usedSecondWindCount = 0;
     location.reload();
   });
 
-  // Upgrade modal
- document.getElementById("upgradeNowBtn").addEventListener("click", function () {
-  setSummitAccess(true);
-  localStorage.removeItem("used-second-wind"); // reset usage for today
-  document.getElementById("upgradeModal").style.display = "none";
-  showToast("Summit Access unlocked!");
-  updateSecondWindState();
-});
-
+  document.getElementById("upgradeNowBtn").addEventListener("click", function () {
+    setSummitAccess(true);
+    usedSecondWindCount = 0;
+    localStorage.setItem("used-second-wind-count", 0);
+    document.getElementById("upgradeModal").style.display = "none";
+    showToast("Summit Access unlocked!");
+    updateSecondWindState();
+    location.reload();
+  });
 
   document.getElementById("cancelUpgradeBtn").addEventListener("click", function () {
     document.getElementById("upgradeModal").style.display = "none";
@@ -2548,4 +2551,5 @@ setSummitAccess(summitState);
     });
   });
 };
+
 
