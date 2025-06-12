@@ -1,0 +1,113 @@
+
+  <div class="app-wrapper">
+    <div class="leather-header">
+      <h1 class="leather-title">Rangebook</h1>
+    </div>
+
+    <div class="container">
+      <p id="promptText">Loading prompt...</p>
+
+      <p id="streakTracker" style="font-style: italic; color: #555; margin-bottom: 1rem; display: none;"></p>
+
+      <div id="bookmarkControls" style="margin: 0.5rem 0; display: none;">
+        <button id="bookmarkButton">📌 Bookmark This Prompt</button>
+      </div>
+
+      <div style="position: relative; display: inline-block; width: 100%;">
+        <textarea id="journalEntry" placeholder="Write your journal entry here..." style="width: 100%;"></textarea>
+        <img id="streakBadge" src="" alt="" style="display: none; position: absolute; bottom: 8px; right: 8px; width: 40px; height: 40px;">
+      </div>
+
+      <div class="button-group">
+        <button id="saveEntryBtn">Save Entry</button>
+        <button id="toggleHistoryBtn">View Journal History</button>
+        <button id="secondPromptBtn">Second Wind (0 left)</button>
+        <button id="undoButton">Undo Prompt</button>
+        <button id="resetButton" style="display: none;">Reset All</button>
+      </div>
+
+      <p id="status"></p>
+      <p id="goalReminder" style="color: darkorange; font-style: italic; display: none;"></p>
+
+      <div id="goalSection" style="margin: 1rem 0; display: none;">
+        <label for="monthlyGoal"><strong>Your Goal for This Month:</strong></label><br>
+        <textarea id="monthlyGoal" placeholder="Set your goal..." style="width: 100%; margin-top: 0.5rem;"></textarea><br>
+        <button id="saveGoalBtn">Save Goal</button>
+        <p id="goalStatus" style="margin-top: 0.5rem;"></p>
+      </div>
+
+      <div style="margin: 1rem 0;">
+        <label for="reminderTime"><strong>Daily Reminder Time:</strong></label>
+        <input type="time" id="reminderTime">
+      </div>
+
+      <div style="margin: 1rem 0;">
+        <label for="monthFilter"><strong>Filter by Month:</strong></label>
+        <select id="monthFilter">
+          <option value="all">All Months</option>
+          <option value="1">January</option>
+          <option value="2">February</option>
+          <option value="3">March</option>
+          <option value="4">April</option>
+          <option value="5">May</option>
+          <option value="6">June</option>
+          <option value="7">July</option>
+          <option value="8">August</option>
+          <option value="9">September</option>
+          <option value="10">October</option>
+          <option value="11">November</option>
+          <option value="12">December</option>
+        </select>
+      </div>
+
+      <div id="upgradeModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 999; justify-content: center; align-items: center;">
+        <div style="background: white; padding: 2rem; border-radius: 8px; max-width: 400px; text-align: center;">
+          <h2>Summit Access</h2>
+          <p>Unlock extra daily prompts, skip options, and full history features.</p>
+          <button id="upgradeNowBtn" style="margin-right: 1rem;">Upgrade Now</button>
+          <button id="cancelUpgradeBtn">Cancel</button>
+        </div>
+      </div>
+
+      <div id="historyContainer" style="display: none; margin-top: 2rem;">
+        <h2>Journal History</h2>
+        <ul id="historyList"></ul>
+      </div>
+
+      <div id="bookmarkedContainer" style="display: none; margin-top: 2rem;">
+        <h2>Bookmarked Prompts</h2>
+        <ul id="bookmarkedList"></ul>
+      </div>
+
+      <div id="exportSection" style="display: none; text-align: center; margin-top: 1rem;">
+        <button id="exportJournalBtn" style="background-color: #4682B4;">Export My Journal (.txt)</button>
+      </div>
+
+      <div id="upgradeBanner" style="text-align: center; margin-top: 2rem;">
+        <p>Want more prompts and features? <strong>Unlock Summit Access</strong> today.</p>
+       <button id="openModalBtn" data-upgrade>Upgrade Now</button>
+
+        <button id="viewBookmarksBtn">View Bookmarked Prompts</button>
+      </div>
+
+      <div id="progressDashboard" style="display: none; margin-top: 2rem;">
+        <h2>Progress Dashboard</h2>
+        <p id="progressStats">Loading...</p>
+        <button id="toggleDashboardBtn">Hide Dashboard</button>
+      </div>
+<head>
+  <meta charset="UTF-8">
+  <title>Rangebook</title>
+  <link rel="stylesheet" href="style.css"> <!-- ← This connects your CSS -->
+</head>
+
+      <div id="archiveContainer" style="display: none; margin-top: 2rem;">
+        <h2>Prompt Archive</h2>
+        <ul id="archiveList"></ul>
+        <button id="toggleArchiveBtn">Hide Archive</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #333; color: #fff; padding: 0.75rem 1.5rem; border-radius: 5px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); z-index: 1000; opacity: 0; transition: opacity 0.5s ease;"></div>
+<script src="script.js"></script>
