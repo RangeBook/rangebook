@@ -2425,124 +2425,115 @@ window.promptsByMonth = {
   ]
 };
 window.promptsByMonth = promptsByMonth;
-let summitAccess = JSON.parse(localStorage.getItem("summitAccess")) || false;
-let promptHistory = [];
-let currentPrompt = null;
-let secondPromptUsed = false;
+// === Rangebook Core Script ===
 
-function getRandomPrompt() {
-  const month = new Date().getMonth() + 1;
-  const prompts = promptsByMonth[month] || [];
-  const available = prompts.filter(p => !promptHistory.includes(p.text));
-  const prompt = available[Math.floor(Math.random() * available.length)];
-  return prompt || { theme: "N/A", text: "You're all caught up!" };
+const isDevMode = true;
+let summitAccess = localStorage.getItem("rangebook-summit-access") === "true";
+let usedSecondWind = localStorage.getItem("used-second-wind") === new Date().toISOString().split('T')[0];
+
+function setSummitAccess(enabled) {
+  summitAccess = enabled;
+  localStorage.setItem("rangebook-summit-access", enabled);
+}
+
+function updateSecondWindState() {
+  const btn = document.getElementById("secondPromptBtn");
+  const today = new Date().toISOString().split('T')[0];
+  const usedToday = localStorage.getItem("used-second-wind") === today;
+
+  if (!summitAccess) {
+    btn.textContent = "Second Wind (Upgrade Required)";
+    btn.disabled = true;
+  } else if (usedToday) {
+    btn.textContent = "Second Wind (0 left)";
+    btn.disabled = true;
+  } else {
+    btn.textContent = "Second Wind (1 left)";
+    btn.disabled = false;
+  }
 }
 
 function showPrompt() {
-  currentPrompt = getRandomPrompt();
-  if (!currentPrompt) return;
-  document.getElementById("promptText").innerText = currentPrompt.text;
-  secondPromptUsed = false;
-  updateSecondWindButton();
+  const prompt = getTodaysPrompt();
+  document.getElementById("promptText").textContent = prompt.text;
+  document.getElementById("promptText").dataset.currentPrompt = prompt.text;
 }
 
-function updateSecondWindButton() {
-  const btn = document.getElementById("secondPromptBtn");
-  btn.innerText = `Second Wind (${secondPromptUsed ? 0 : 1} left)`;
-  btn.disabled = secondPromptUsed || !summitAccess;
-}
-
-function handleSecondPrompt() {
-  if (secondPromptUsed || !summitAccess) return;
-  secondPromptUsed = true;
-  promptHistory.push(currentPrompt.text);
-  showPrompt();
-}
-
-function handleResetAll() {
-  localStorage.clear();
-  promptHistory = [];
-  summitAccess = false;
-  secondPromptUsed = false;
-  document.getElementById("journalEntry").value = "";
-  document.getElementById("monthlyGoal").value = "";
-  document.getElementById("status").innerText = "App has been reset.";
-  showPrompt();
-  updateSecondWindButton();
-}
-
-function handleSaveGoal() {
-  const goal = document.getElementById("monthlyGoal").value.trim();
-  localStorage.setItem("rangebook-monthly-goal", goal);
-  document.getElementById("goalStatus").innerText = "Goal saved.";
-}
-
-function handleUpgrade() {
-  summitAccess = true;
-  localStorage.setItem("summitAccess", true);
-  document.getElementById("upgradeModal").style.display = "none";
-  updateSecondWindButton();
-  document.getElementById("goalSection").style.display = "block";
-  document.getElementById("exportSection").style.display = "block";
-}
-
-function openModal() {
-  document.getElementById("upgradeModal").style.display = "flex";
-}
-
-function closeModal() {
-  document.getElementById("upgradeModal").style.display = "none";
-}
-
-function loadMonthlyGoal() {
-  const saved = localStorage.getItem("rangebook-monthly-goal");
-  if (saved) {
-    document.getElementById("monthlyGoal").value = saved;
-    document.getElementById("goalStatus").innerText = "Goal loaded.";
-  }
+function getTodaysPrompt() {
+  // Replace this with actual logic for prompt by day
+  return { text: "What did you learn today?" };
 }
 
 function showToast(message) {
   const toast = document.getElementById("toast");
   toast.textContent = message;
   toast.style.display = "block";
-  toast.style.opacity = "1";
+  toast.style.opacity = 1;
   setTimeout(() => {
-    toast.style.opacity = "0";
-    setTimeout(() => toast.style.display = "none", 500);
-  }, 2000);
+    toast.style.opacity = 0;
+    setTimeout(() => (toast.style.display = "none"), 500);
+  }, 2500);
 }
 
-// Load UI on page load
 window.onload = function () {
-  try {
-    showPrompt();
-    loadMonthlyGoal();
-    updateSecondWindButton();
+  showPrompt();
+  updateSecondWindState();
 
-    document.getElementById("secondPromptBtn").addEventListener("click", handleSecondPrompt);
-    document.getElementById("resetButton").addEventListener("click", handleResetAll);
-    document.getElementById("saveGoalBtn").addEventListener("click", handleSaveGoal);
-
-    document.getElementById("upgradeNowBtn").addEventListener("click", handleUpgrade);
-    document.getElementById("cancelUpgradeBtn").addEventListener("click", closeModal);
-    document.querySelectorAll('[data-upgrade]').forEach(btn =>
-      btn.addEventListener("click", openModal)
-    );
-
-    const savedTime = localStorage.getItem("rangebook-reminder-time");
-    if (savedTime) {
-      document.getElementById("reminderTime").value = savedTime;
-    }
-
-    document.getElementById("reminderTime").addEventListener("change", function () {
-      localStorage.setItem("rangebook-reminder-time", this.value);
-      showToast("Reminder time saved.");
-    });
-
-  } catch (err) {
-    console.error("Startup error:", err);
-    showToast("App failed to load correctly.");
+  if (summitAccess) {
+    document.getElementById("goalSection").style.display = "block";
+    document.getElementById("exportSection").style.display = "block";
   }
+
+  if (isDevMode) {
+    const resetBtn = document.getElementById("resetButton");
+    if (resetBtn) resetBtn.style.display = "inline-block";
+  }
+
+  // Reminder Time Setup
+  const savedTime = localStorage.getItem("rangebook-reminder-time");
+  if (savedTime) {
+    document.getElementById("reminderTime").value = savedTime;
+  }
+
+  document.getElementById("reminderTime").addEventListener("change", function () {
+    const time = this.value;
+    localStorage.setItem("rangebook-reminder-time", time);
+    showToast("Reminder time saved.");
+  });
+
+  document.getElementById("secondPromptBtn").addEventListener("click", function () {
+    if (summitAccess && !usedSecondWind) {
+      const newPrompt = { text: "What would make tomorrow better than today?" };
+      document.getElementById("promptText").textContent = newPrompt.text;
+      localStorage.setItem("used-second-wind", new Date().toISOString().split('T')[0]);
+      updateSecondWindState();
+    } else {
+      showToast("Second Wind is unavailable.");
+    }
+  });
+
+  document.getElementById("resetButton").addEventListener("click", function () {
+    localStorage.clear();
+    location.reload();
+  });
+
+  // Upgrade modal
+  document.getElementById("upgradeNowBtn").addEventListener("click", function () {
+    setSummitAccess(true);
+    document.getElementById("upgradeModal").style.display = "none";
+    showToast("Summit Access unlocked!");
+    updateSecondWindState();
+    location.reload();
+  });
+
+  document.getElementById("cancelUpgradeBtn").addEventListener("click", function () {
+    document.getElementById("upgradeModal").style.display = "none";
+  });
+
+  document.querySelectorAll("[data-upgrade]").forEach(btn => {
+    btn.addEventListener("click", function () {
+      document.getElementById("upgradeModal").style.display = "flex";
+    });
+  });
 };
 
