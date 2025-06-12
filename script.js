@@ -2425,503 +2425,124 @@ window.promptsByMonth = {
   ]
 };
 window.promptsByMonth = promptsByMonth;
-// === GLOBAL VARIABLES ===
-const summitAccess = localStorage.getItem("summitAccess") === "true";
-const isDevMode = true;
-let currentPrompt = "";
-let lastPrompt = "";
+let summitAccess = JSON.parse(localStorage.getItem("summitAccess")) || false;
+let promptHistory = [];
+let currentPrompt = null;
+let secondPromptUsed = false;
 
-function showToast(message) {
-  const toast = document.getElementById("toast");
-  if (!toast) return;
-  toast.textContent = message;
-  toast.style.display = "block";
-  toast.style.opacity = 1;
-  setTimeout(() => {
-    toast.style.opacity = 0;
-    setTimeout(() => (toast.style.display = "none"), 500);
-  }, 3000);
-}
-function openModal() {
-  const modal = document.getElementById("upgradeModal");
-  if (modal) modal.style.display = "flex";
-}
-
-function closeModal() {
-  const modal = document.getElementById("upgradeModal");
-  if (modal) modal.style.display = "none";
-}
-
-function getTodayKey() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function getPromptViewsToday() {
-  const key = `views-${getTodayKey()}`;
-  return parseInt(localStorage.getItem(key) || "0", 10);
-}
-
-function incrementPromptViewsToday() {
-  const key = `views-${getTodayKey()}`;
-  const current = getPromptViewsToday();
-  localStorage.setItem(key, (current + 1).toString());
-}
-
-function getJournalHistory() {
-  const data = localStorage.getItem("rangebook-history");
-  return data ? JSON.parse(data) : [];
-}
-
-function saveJournalHistory(promptText, entryText) {
-  const history = getJournalHistory();
-  history.unshift({ prompt: promptText, entry: entryText, date: new Date().toLocaleString() });
-  localStorage.setItem("rangebook-history", JSON.stringify(history));
-}
-
-function undoPrompt() {
-  if (!lastPrompt) return;
-  currentPrompt = lastPrompt;
-  document.getElementById("promptText").textContent = currentPrompt;
-  showToast("Reverted to previous prompt.");
-}
-
-function updateProgressDashboard() {
-  if (!summitAccess) return;
+function getRandomPrompt() {
   const month = new Date().getMonth() + 1;
-  const monthPrompts = promptsByMonth[month.toString()] || [];
-  const seen = JSON.parse(localStorage.getItem(`seen-${month}`) || "[]");
-  const percent = ((seen.length / monthPrompts.length) * 100).toFixed(1);
-  const stats = document.getElementById("progressStats");
-  const dash = document.getElementById("progressDashboard");
-  if (dash) dash.style.display = "block";
-  if (stats) stats.textContent = `You’ve completed ${seen.length} of ${monthPrompts.length} prompts (${percent}%).`;
+  const prompts = promptsByMonth[month] || [];
+  const available = prompts.filter(p => !promptHistory.includes(p.text));
+  const prompt = available[Math.floor(Math.random() * available.length)];
+  return prompt || { theme: "N/A", text: "You're all caught up!" };
 }
 
 function showPrompt() {
-  console.log("Loaded showPrompt function");
-
-  const views = getPromptViewsToday();
-  console.log("Prompt views today:", views);
-
-  const limit = summitAccess ? 5 : 2;
-  console.log("Summit access:", summitAccess, "Limit:", limit);
-
-  if (views >= limit) {
-    showToast("You’ve reached your prompt limit for today.");
-    return;
-  }
-
-  const month = new Date().getMonth() + 1;
-  const seenKey = `seen-${month}`;
-  const seen = JSON.parse(localStorage.getItem(seenKey) || "[]");
-  const prompts = promptsByMonth[month.toString()] || [];
-  const unseen = prompts.map((p, i) => ({ ...p, index: i })).filter(p => !seen.includes(p.index));
-
-  if (unseen.length === 0) {
-    document.getElementById("promptText").textContent = "You’ve completed all prompts for this month.";
-    return;
-  }
-
-  const chosen = unseen[Math.floor(Math.random() * unseen.length)];
-  lastPrompt = currentPrompt;
-  currentPrompt = chosen.text;
-  document.getElementById("promptText").textContent = currentPrompt;
-  seen.push(chosen.index);
-  localStorage.setItem(seenKey, JSON.stringify(seen));
-  incrementPromptViewsToday();
-  updateProgressDashboard();
+  currentPrompt = getRandomPrompt();
+  if (!currentPrompt) return;
+  document.getElementById("promptText").innerText = currentPrompt.text;
+  secondPromptUsed = false;
   updateSecondWindButton();
 }
 
 function updateSecondWindButton() {
   const btn = document.getElementById("secondPromptBtn");
-  if (!btn) return;
-  const used = getPromptViewsToday();
-  const max = summitAccess ? 5 : 2;
-  const remaining = Math.max(0, max - used);
-  btn.textContent = `Second Wind (${remaining} left)`;
-  btn.disabled = remaining <= 0;
+  btn.innerText = `Second Wind (${secondPromptUsed ? 0 : 1} left)`;
+  btn.disabled = secondPromptUsed || !summitAccess;
 }
 
-function showSecondPrompt() {
-  if (getPromptViewsToday() >= (summitAccess ? 5 : 2)) {
-    showToast("No more prompts today.");
-    return;
-  }
+function handleSecondPrompt() {
+  if (secondPromptUsed || !summitAccess) return;
+  secondPromptUsed = true;
+  promptHistory.push(currentPrompt.text);
   showPrompt();
 }
 
-function skipPrompt() {
-  const used = localStorage.getItem(`skipped-${getTodayKey()}`) === "true";
-  if (used) {
-    showToast("Skip already used today.");
-    return;
-  }
-  localStorage.setItem(`skipped-${getTodayKey()}`, "true");
+function handleResetAll() {
+  localStorage.clear();
+  promptHistory = [];
+  summitAccess = false;
+  secondPromptUsed = false;
+  document.getElementById("journalEntry").value = "";
+  document.getElementById("monthlyGoal").value = "";
+  document.getElementById("status").innerText = "App has been reset.";
   showPrompt();
+  updateSecondWindButton();
 }
 
-function saveEntry() {
-  const entry = document.getElementById("journalEntry").value;
-  const prompt = document.getElementById("promptText").textContent;
-  if (entry.trim().length === 0) {
-    showToast("Entry is empty — not saved.");
-    return;
-  }
-  localStorage.setItem("rangebook-entry", entry);
-  saveJournalHistory(prompt, entry);
-  updateStreak();
-showToast("Entry saved to history.");updateStreakBadge();
-
+function handleSaveGoal() {
+  const goal = document.getElementById("monthlyGoal").value.trim();
+  localStorage.setItem("rangebook-monthly-goal", goal);
+  document.getElementById("goalStatus").innerText = "Goal saved.";
 }
 
-function toggleHistory() {
-  const container = document.getElementById("historyContainer");
-  if (!container) return;
-  container.style.display = container.style.display === "none" ? "block" : "none";
-  if (container.style.display === "block") renderHistory();
+function handleUpgrade() {
+  summitAccess = true;
+  localStorage.setItem("summitAccess", true);
+  document.getElementById("upgradeModal").style.display = "none";
+  updateSecondWindButton();
+  document.getElementById("goalSection").style.display = "block";
+  document.getElementById("exportSection").style.display = "block";
 }
 
-function renderHistory() {
-  const list = document.getElementById("historyList");
-  const history = getJournalHistory();
-  list.innerHTML = "";
-  history.forEach(item => {
-    const li = document.createElement("li");
-    li.innerHTML = `<strong>${item.prompt}</strong><br><em>${item.date}</em><br>${item.entry}<hr>`;
-    list.appendChild(li);
-  });
+function openModal() {
+  document.getElementById("upgradeModal").style.display = "flex";
 }
 
-function loadPromptArchive() {
-  if (!summitAccess) return;
-  const container = document.getElementById("archiveContainer");
-  const list = document.getElementById("archiveList");
-  if (!container || !list) return;
-  container.style.display = "block";
-  const month = new Date().getMonth() + 1;
-  const prompts = promptsByMonth[month.toString()] || [];
-  list.innerHTML = "";
-  prompts.forEach(p => {
-    const li = document.createElement("li");
-    li.textContent = p.text;
-    list.appendChild(li);
-  });
-}
-
-function toggleArchive() {
-  const container = document.getElementById("archiveContainer");
-  if (!container) return;
-  const current = container.style.display;
-  container.style.display = current === "none" ? "block" : "none";
-}
-
-function toggleDashboard() {
-  const dash = document.getElementById("progressDashboard");
-  if (!dash) return;
-  const current = dash.style.display;
-  dash.style.display = current === "none" ? "block" : "none";
-}
-
-function bookmarkPrompt() {
-  const current = document.getElementById("promptText").textContent.trim();
-  if (!current || current.includes("You’ve already") || current.includes("You’ve completed")) return;
-  const key = "rangebook-bookmarks";
-  const bookmarks = JSON.parse(localStorage.getItem(key) || "[]");
-  if (!bookmarks.includes(current)) {
-    bookmarks.unshift(current);
-    localStorage.setItem(key, JSON.stringify(bookmarks));
-    showToast("Prompt bookmarked!");
-  } else {
-    showToast("Already bookmarked.");
-  }
-}
-
-function showBookmarks() {
-  const list = document.getElementById("bookmarkedList");
-  const container = document.getElementById("bookmarkedContainer");
-  const bookmarks = JSON.parse(localStorage.getItem("rangebook-bookmarks") || "[]");
-  list.innerHTML = "";
-  if (bookmarks.length === 0) {
-    list.innerHTML = "<li>No bookmarked prompts yet.</li>";
-  } else {
-    bookmarks.forEach((prompt, index) => {
-      const li = document.createElement("li");
-      li.innerHTML = `<strong>${prompt}</strong> <button onclick="removeBookmark(${index})">Remove</button><hr>`;
-      list.appendChild(li);
-    });
-  }
-  container.style.display = "block";
-}
-
-function removeBookmark(index) {
-  const bookmarks = JSON.parse(localStorage.getItem("rangebook-bookmarks") || "[]");
-  bookmarks.splice(index, 1);
-  localStorage.setItem("rangebook-bookmarks", JSON.stringify(bookmarks));
-  showBookmarks();
-}
-
-function exportJournal() {
-  const history = getJournalHistory();
-  if (history.length === 0) {
-    alert("You have no journal entries to export.");
-    return;
-  }
-  let content = "Rangebook Journal Entries\n\n";
-  history.forEach(item => {
-    content += `Prompt: ${item.prompt}\nDate: ${item.date}\nEntry:\n${item.entry}\n\n---\n\n`;
-  });
-  const blob = new Blob([content], { type: "text/plain" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "Rangebook_Journal.txt";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
-function getMonthlyGoalKey() {
-  const month = new Date().getMonth() + 1;
-  return `goal-${month}`;
+function closeModal() {
+  document.getElementById("upgradeModal").style.display = "none";
 }
 
 function loadMonthlyGoal() {
-  const textarea = document.getElementById("monthlyGoal");
-  const goalStatus = document.getElementById("goalStatus");
-  if (!textarea) return;
-
-  const key = getMonthlyGoalKey();
-  const saved = localStorage.getItem(key);
+  const saved = localStorage.getItem("rangebook-monthly-goal");
   if (saved) {
-    textarea.value = saved;
-    if (goalStatus) goalStatus.textContent = "Goal loaded.";
-  } else {
-    if (goalStatus) goalStatus.textContent = "No goal set yet.";
-  }
-
-  const reminder = document.getElementById("goalReminder");
-  if (reminder) {
-    reminder.textContent = saved ? "" : "Tip: Set your monthly goal to stay on track.";
-    reminder.style.display = saved ? "none" : "block";
+    document.getElementById("monthlyGoal").value = saved;
+    document.getElementById("goalStatus").innerText = "Goal loaded.";
   }
 }
 
-function saveMonthlyGoal() {
-  const textarea = document.getElementById("monthlyGoal");
-  const goalStatus = document.getElementById("goalStatus");
-  if (!textarea) return;
-  const key = getMonthlyGoalKey();
-  const value = textarea.value.trim();
-  if (value.length === 0) {
-    goalStatus.textContent = "Goal cannot be empty.";
-    return;
-  }
-  localStorage.setItem(key, value);
-  goalStatus.textContent = "Goal saved!";
-}
-
-function unlockSummit() {
-  localStorage.setItem("summitAccess", "true");
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.style.display = "block";
+  toast.style.opacity = "1";
   setTimeout(() => {
-  window.location.href = window.location.href;
-}, 100);
-}
-function getStreakKey() {
-  return "rangebook-streak";
+    toast.style.opacity = "0";
+    setTimeout(() => toast.style.display = "none", 500);
+  }, 2000);
 }
 
-function getLastEntryDateKey() {
-  return "last-entry-date";
-}
-
-function updateStreak() {
-  const today = new Date().toISOString().slice(0, 10);
-  const lastEntry = localStorage.getItem(getLastEntryDateKey());
-  let streak = parseInt(localStorage.getItem(getStreakKey()) || "0");
-
-  if (lastEntry === today) {
-    // Already counted today
-    return;
-  }
-
-  if (lastEntry) {
-    const diff = (new Date(today) - new Date(lastEntry)) / (1000 * 60 * 60 * 24);
-    streak = diff === 1 ? streak + 1 : 1; // Continue streak or reset
-  } else {
-    streak = 1; // First entry ever
-  }
-
-  localStorage.setItem(getLastEntryDateKey(), today);
-  localStorage.setItem(getStreakKey(), streak.toString());
-
-  const tracker = document.getElementById("streakTracker");
-  if (tracker) {
-    tracker.textContent = `🔥 Current Streak: ${streak} day${streak > 1 ? "s" : ""}`;
-    tracker.style.display = "block";
-  }
-}
-
-function displayStreakOnLoad() {
-  const streak = parseInt(localStorage.getItem(getStreakKey()) || "0");
-  const tracker = document.getElementById("streakTracker");
-  if (tracker && streak > 0) {
-    tracker.textContent = `🔥 Current Streak: ${streak} day${streak > 1 ? "s" : ""}`;
-    tracker.style.display = "block";
-  updateStreakBadge();
-}
-}
-function updateStreakBadge() {
-  const badge = document.getElementById("streakBadge");
-  if (!badge) return;
-
-  const streak = parseInt(localStorage.getItem("rangebook-streak") || "0");
-
-  let badgeX = 0; // horizontal offset (px) in the sprite
-  let show = false;
-
-  if (streak >= 30) {
-    badgeX = 120;
-    show = true;
-  } else if (streak >= 14) {
-    badgeX = 80;
-    show = true;
-  } else if (streak >= 7) {
-    badgeX = 40;
-    show = true;
-  } else if (streak >= 3) {
-    badgeX = 0;
-    show = true;
-  }
-
-  if (show) {
-    badge.src = "https://i.imgur.com/p5Xq0RX.png";
-    badge.style.objectFit = "none";
-    badge.style.objectPosition = `-${badgeX}px 0`;
-    badge.style.display = "block";
-  } else {
-    badge.style.display = "none";
-  }
-}
-
-
-function filterHistoryByMonth() {
-  const month = document.getElementById("monthFilter").value;
-  const list = document.getElementById("historyList");
-  const history = getJournalHistory();
-
-  list.innerHTML = "";
-
-  const filtered = month === "all" ? history : history.filter(entry => {
-    const entryDate = new Date(entry.date);
-    return entryDate.getMonth() + 1 === parseInt(month);
-  });
-
-  if (filtered.length === 0) {
-    list.innerHTML = "<li>No entries for this month.</li>";
-    return;
-  }
-
-  filtered.forEach(item => {
-    const li = document.createElement("li");
-    li.innerHTML = `<strong>${item.prompt}</strong><br><em>${item.date}</em><br>${item.entry}<hr>`;
-    list.appendChild(li);
-  });
-}
-
-function devReset() {
-  if (confirm("This will erase all data. Are you sure?")) {
-    localStorage.clear();
-   window.location.href = window.location.href;
-
-  }
-}
-function saveReminderTime() {
-  const time = document.getElementById("reminderTime").value;
-  if (time) {
-   displayStreakOnLoad();
-
-const savedReminder = localStorage.getItem("rangebook-reminder-time");
-if (savedReminder) {
-  document.getElementById("reminderTime").value = savedReminder;
-  scheduleDailyReminder(savedReminder);
-}
- localStorage.setItem("rangebook-reminder-time", time);
-    scheduleDailyReminder(time);
-    showToast("Reminder time saved.");
-  }
-}
-function scheduleDailyReminder(timeStr) {
-  if (!("Notification" in window)) return;
-
-  Notification.requestPermission().then(permission => {
-    if (permission !== "granted") return;
-
-    const [hours, minutes] = timeStr.split(":").map(Number);
-    const now = new Date();
-    const reminderTime = new Date();
-    reminderTime.setHours(hours, minutes, 0, 0);
-
-    if (reminderTime < now) reminderTime.setDate(reminderTime.getDate() + 1);
-
-    const timeout = reminderTime - now;
-
-    setTimeout(() => {
-      new Notification("⏰ Time to journal in Rangebook!");
-    }, timeout);
-  });
-}
-// Handles modal open/close
-document.getElementById('cancelUpgradeBtn').addEventListener('click', () => {
-  document.getElementById('upgradeModal').style.display = 'none';
-});
-
-document.getElementById('upgradeNowBtn').addEventListener('click', () => {
-  localStorage.setItem('summitAccess', 'true');
-  document.getElementById('upgradeModal').style.display = 'none';
-  showToast("🎉 Summit Access unlocked!");
-  // Reload the app to re-run Summit UI logic
-  setTimeout(() => {
-window.location.href = window.location.href;
-
-  }, 800);
-});
-
+// Load UI on page load
 window.onload = function () {
   try {
     showPrompt();
-    loadPromptArchive();
-    updateProgressDashboard();
     loadMonthlyGoal();
-    displayStreakOnLoad();
+    updateSecondWindButton();
 
-    if (isDevMode) {
-      document.getElementById("resetButton").style.display = "inline-block";
+    document.getElementById("secondPromptBtn").addEventListener("click", handleSecondPrompt);
+    document.getElementById("resetButton").addEventListener("click", handleResetAll);
+    document.getElementById("saveGoalBtn").addEventListener("click", handleSaveGoal);
+
+    document.getElementById("upgradeNowBtn").addEventListener("click", handleUpgrade);
+    document.getElementById("cancelUpgradeBtn").addEventListener("click", closeModal);
+    document.querySelectorAll('[data-upgrade]').forEach(btn =>
+      btn.addEventListener("click", openModal)
+    );
+
+    const savedTime = localStorage.getItem("rangebook-reminder-time");
+    if (savedTime) {
+      document.getElementById("reminderTime").value = savedTime;
     }
 
-    if (summitAccess) {
-      const goalSection = document.getElementById("goalSection");
-      const exportSection = document.getElementById("exportSection");
-      if (goalSection) goalSection.style.display = "block";
-      if (exportSection) exportSection.style.display = "block";
-    }
-const upgradeButtons = document.querySelectorAll('[data-upgrade]');
-upgradeButtons.forEach(btn => {
-  btn.addEventListener('click', openModal);
-});
-window.updateStreakBadge = updateStreakBadge;
-window.displayStreakOnLoad = displayStreakOnLoad;
-
-    const savedReminder = localStorage.getItem("rangebook-reminder-time");
-    if (savedReminder) {
-      document.getElementById("reminderTime").value = savedReminder;
-      scheduleDailyReminder(savedReminder);
-    }
+    document.getElementById("reminderTime").addEventListener("change", function () {
+      localStorage.setItem("rangebook-reminder-time", this.value);
+      showToast("Reminder time saved.");
+    });
 
   } catch (err) {
-    console.error("Something went wrong during startup:", err);
-    showToast("Oops! Something went wrong loading the app.");
+    console.error("Startup error:", err);
+    showToast("App failed to load correctly.");
   }
 };
-
 
