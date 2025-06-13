@@ -1,3 +1,30 @@
+.tagline {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  font-style: italic;
+  text-align: center;
+}
+
+.not-this {
+  background-color: #f5f2e9;
+  padding: 2rem;
+  margin: 2rem auto;
+  border-left: 4px solid #5a4636;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  max-width: 700px;
+}
+
+.founder-statement {
+  font-style: italic;
+  font-size: 1rem;
+  max-width: 700px;
+  margin: 2rem auto;
+  padding: 1rem 2rem;
+  text-align: center;
+  color: #333;
+  border-top: 1px solid #ddd;
+}
 body {
   font-family: 'Segoe UI', system-ui, sans-serif;
 }
