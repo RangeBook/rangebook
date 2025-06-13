@@ -2425,11 +2425,24 @@ window.promptsByMonth = {
   ]
 };
 window.promptsByMonth = promptsByMonth;
-const isDevMode = true;
-const MAX_SECOND_WINDS = 5;
+// === Rangebook Core Script ===
 
+const isDevMode = true;
 let summitAccess = localStorage.getItem("rangebook-summit-access") === "true";
 let usedSecondWindCount = parseInt(localStorage.getItem("used-second-wind-count")) || 0;
+const MAX_SECOND_WINDS = 5;
+
+function getMonthlyPromptList() {
+  const currentMonth = new Date().getMonth() + 1;
+  const promptBank = JSON.parse(localStorage.getItem("rangebook-prompt-bank") || "{}");
+  return promptBank[currentMonth] || [];
+}
+
+function getRandomPrompt(exclude = []) {
+  const prompts = getMonthlyPromptList();
+  const available = prompts.filter(p => !exclude.includes(p));
+  return available.length > 0 ? available[Math.floor(Math.random() * available.length)] : prompts[0] || "No prompt available.";
+}
 
 function setSummitAccess(enabled) {
   summitAccess = enabled;
@@ -2451,34 +2464,66 @@ function updateSecondWindState() {
   }
 }
 
-function getPromptsForMonth(month) {
-  const prompts = promptsByMonth[String(month)];
-  return prompts ? prompts.map(p => p.text) : [];
+function showPrompt() {
+  const prompt = getRandomPrompt();
+  document.getElementById("promptText").textContent = prompt;
+  document.getElementById("promptText").dataset.currentPrompt = prompt;
+  localStorage.setItem("last-prompt", prompt);
 }
 
-function getRandomPromptFrom(pool, exclude = []) {
-  const available = pool.filter(p => !exclude.includes(p));
-  return available.length ? available[Math.floor(Math.random() * available.length)] : null;
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.style.display = "block";
+  toast.style.opacity = 1;
+  setTimeout(() => {
+    toast.style.opacity = 0;
+    setTimeout(() => (toast.style.display = "none"), 500);
+  }, 2500);
 }
 
-function showPrompt(prompt) {
-  const promptText = document.getElementById("promptText");
-  promptText.textContent = prompt;
-  promptText.dataset.currentPrompt = prompt;
+function saveEntry() {
+  const entry = document.getElementById("journalEntry").value.trim();
+  const prompt = document.getElementById("promptText").dataset.currentPrompt;
+  if (!entry) return showToast("Entry is empty.");
+
+  const history = JSON.parse(localStorage.getItem("rangebook-history") || "[]");
+  history.push({ date: new Date().toISOString(), prompt, entry });
+  localStorage.setItem("rangebook-history", JSON.stringify(history));
+  document.getElementById("journalEntry").value = "";
+  showToast("Entry saved.");
+}
+
+function loadJournalHistory() {
+  const list = document.getElementById("historyList");
+  list.innerHTML = "";
+  const history = JSON.parse(localStorage.getItem("rangebook-history") || "[]");
+  history.forEach(item => {
+    const li = document.createElement("li");
+    li.innerHTML = `<strong>${new Date(item.date).toLocaleDateString()}:</strong> <em>${item.prompt}</em><br>${item.entry}`;
+    list.appendChild(li);
+  });
+  document.getElementById("historyContainer").style.display = "block";
+}
+
+function undoPrompt() {
+  const last = localStorage.getItem("last-prompt");
+  if (last) {
+    document.getElementById("promptText").textContent = last;
+    document.getElementById("promptText").dataset.currentPrompt = last;
+    showToast("Prompt reverted.");
+  }
+}
+
+function saveGoal() {
+  const goal = document.getElementById("monthlyGoal").value.trim();
+  if (!goal) return showToast("Goal is empty.");
+  localStorage.setItem("rangebook-monthly-goal", goal);
+  document.getElementById("goalStatus").textContent = "Goal saved.";
 }
 
 window.onload = function () {
-  const month = new Date().getMonth() + 1;
-  const promptPool = getPromptsForMonth(month);
-  let usedPrompts = [];
-
-  // First prompt
-  const firstPrompt = getRandomPromptFrom(promptPool);
-  if (firstPrompt) {
-    showPrompt(firstPrompt);
-    usedPrompts.push(firstPrompt);
-  }
-
+  showPrompt();
   updateSecondWindState();
 
   if (summitAccess) {
@@ -2504,16 +2549,13 @@ window.onload = function () {
 
   document.getElementById("secondPromptBtn").addEventListener("click", function () {
     if (summitAccess && usedSecondWindCount < MAX_SECOND_WINDS) {
-      const newPrompt = getRandomPromptFrom(promptPool, usedPrompts);
-      if (newPrompt) {
-        showPrompt(newPrompt);
-        usedPrompts.push(newPrompt);
-        usedSecondWindCount++;
-        localStorage.setItem("used-second-wind-count", usedSecondWindCount);
-        updateSecondWindState();
-      } else {
-        showToast("No more unique prompts available.");
-      }
+      const current = document.getElementById("promptText").dataset.currentPrompt;
+      const newPrompt = getRandomPrompt([current]);
+      document.getElementById("promptText").textContent = newPrompt;
+      document.getElementById("promptText").dataset.currentPrompt = newPrompt;
+      usedSecondWindCount++;
+      localStorage.setItem("used-second-wind-count", usedSecondWindCount);
+      updateSecondWindState();
     } else {
       showToast("Second Wind is unavailable.");
     }
@@ -2544,17 +2586,11 @@ window.onload = function () {
       document.getElementById("upgradeModal").style.display = "flex";
     });
   });
-};
 
-function showToast(message) {
-  const toast = document.getElementById("toast");
-  toast.textContent = message;
-  toast.style.display = "block";
-  toast.style.opacity = 1;
-  setTimeout(() => {
-    toast.style.opacity = 0;
-    setTimeout(() => (toast.style.display = "none"), 500);
-  }, 2500);
-}
+  document.getElementById("saveEntryBtn").addEventListener("click", saveEntry);
+  document.getElementById("undoButton").addEventListener("click", undoPrompt);
+  document.getElementById("saveGoalBtn").addEventListener("click", saveGoal);
+  document.getElementById("toggleHistoryBtn").addEventListener("click", loadJournalHistory);
+};
 
 
