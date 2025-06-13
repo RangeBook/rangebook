@@ -331,9 +331,39 @@ if (upgradeBtn) {
     });
   });
 
-  document.getElementById("saveEntryBtn").addEventListener("click", saveEntry);
-  document.getElementById("undoButton").addEventListener("click", undoPrompt);
-  document.getElementById("saveGoalBtn").addEventListener("click", saveGoal);
-  document.getElementById("toggleHistoryBtn").addEventListener("click", loadJournalHistory);
-document.getElementById("viewBookmarksBtn").addEventListener("click", loadBookmarkedPrompts);
-};
+  const saveEntryBtn = document.getElementById("saveEntryBtn");
+if (saveEntryBtn) saveEntryBtn.addEventListener("click", saveEntry);
+
+const undoBtn = document.getElementById("undoButton");
+if (undoBtn) undoBtn.addEventListener("click", undoPrompt);
+
+const saveGoalBtn = document.getElementById("saveGoalBtn");
+if (saveGoalBtn) saveGoalBtn.addEventListener("click", saveGoal);
+
+const toggleHistoryBtn = document.getElementById("toggleHistoryBtn");
+if (toggleHistoryBtn) toggleHistoryBtn.addEventListener("click", loadJournalHistory);
+
+const viewBookmarksBtn = document.getElementById("viewBookmarksBtn");
+if (viewBookmarksBtn) viewBookmarksBtn.addEventListener("click", loadBookmarkedPrompts);
+
+const bookmarkBtn = document.getElementById("bookmarkButton");
+if (bookmarkBtn) bookmarkBtn.addEventListener("click", function () {
+  const prompt = document.getElementById("promptText").dataset.currentPrompt;
+  if (!prompt) return;
+
+  let bookmarks = JSON.parse(localStorage.getItem("rangebook-bookmarks") || "[]");
+  const index = bookmarks.indexOf(prompt);
+
+  if (index === -1) {
+    bookmarks.push(prompt);
+    localStorage.setItem("rangebook-bookmarks", JSON.stringify(bookmarks));
+    showToast("Prompt bookmarked.");
+  } else {
+    bookmarks.splice(index, 1);
+    localStorage.setItem("rangebook-bookmarks", JSON.stringify(bookmarks));
+    showToast("Bookmark removed.");
+  }
+
+  updateBookmarkButton(prompt);
+});
+
