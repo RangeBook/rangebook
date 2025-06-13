@@ -104,3 +104,7 @@ ul {
   font-size: 1.8rem;
   margin-bottom: 1rem;
 }
+.hero-image-wrapper {
+  text-align: center;
+  margin-top: 1rem;
+}
