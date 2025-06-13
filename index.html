@@ -43,13 +43,21 @@
 <div id="monthlyGoalContainer" style="margin-bottom: 1rem;">
   <strong>Theme Goal:</strong>
   <span id="monthlyGoalDisplay"></span>
-  <button onclick="editGoal(currentMonthKey, 'Update your monthly goal:', 'monthlyGoalDisplay')">✎</button>
+  <button
+    onclick="editGoal(currentMonthKey, 'Update your monthly goal:', 'monthlyGoalDisplay')"
+    style="font-size: 0.8rem; margin-left: 0.5rem; background: none; border: none; cursor: pointer; color: #888;"
+    title="Edit Theme Goal"
+  >✎</button>
 </div>
 
 <div id="personalGoalContainer" style="margin-bottom: 1rem;">
   <strong>Personal Goal:</strong>
   <span id="personalGoalDisplay"></span>
-  <button onclick="editGoal(personalGoalKey, 'Update your personal goal:', 'personalGoalDisplay')">✎</button>
+  <button
+    onclick="editGoal(personalGoalKey, 'Update your personal goal:', 'personalGoalDisplay')"
+    style="font-size: 0.8rem; margin-left: 0.5rem; background: none; border: none; cursor: pointer; color: #888;"
+    title="Edit Personal Goal"
+  >✎</button>
 </div>
 
 <div id="goalArchive" style="margin-top: 1rem; font-size: 0.95rem;"></div>
@@ -57,14 +65,7 @@
       <p id="status"></p>
       <p id="goalReminder" style="color: darkorange; font-style: italic; display: none;"></p>
 
-      <div id="goalSection" style="margin: 1rem 0; display: none;">
-        <label for="monthlyGoal"><strong>Your Goal for This Month:</strong></label><br>
-        <textarea id="monthlyGoal" placeholder="Set your goal..." style="width: 100%; margin-top: 0.5rem;"></textarea><br>
-        <button id="saveGoalBtn">Save Goal</button>
-        <p id="goalStatus" style="margin-top: 0.5rem;"></p>
-      </div>
-
-      <div style="margin: 1rem 0;">
+     <div style="margin: 1rem 0;">
         <label for="reminderTime"><strong>Daily Reminder Time:</strong></label>
         <input type="time" id="reminderTime">
       </div>
