@@ -43,13 +43,15 @@ function updateSecondWindState() {
 
 function showPrompt() {
   const prompt = getRandomPrompt();
-  document.getElementById("promptText").textContent = prompt;
-  document.getElementById("promptText").dataset.currentPrompt = prompt;
+  const promptText = document.getElementById("promptText");
+
+  promptText.textContent = prompt;
+  promptText.dataset.currentPrompt = prompt;
+
+  updateBookmarkButton(prompt);
+  document.getElementById("bookmarkControls").style.display = "block";
+
   localStorage.setItem("last-prompt", prompt);
-document.getElementById("bookmarkControls").style.display = "block";
-const prompt = document.getElementById("promptText").dataset.currentPrompt;
-updateBookmarkButton(prompt);
-document.getElementById("bookmarkControls").style.display = "block";
 }
 
 function showToast(message) {
