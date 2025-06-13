@@ -111,9 +111,11 @@
         <ul id="historyList"></ul>
       </div>
 
-      <div id="exportSection" style="display: none; text-align: center; margin-top: 1rem;">
-        <button id="exportJournalBtn" style="background-color: #4682B4;">Export My Journal (.txt)</button>
-      </div>
+      <div id="exportSection" style="text-align: center; margin-top: 1rem;">
+  <button id="exportJournalBtn" onclick="exportJournal()" style="background-color: #4682B4;">Export My Journal (.txt)</button>
+  <button id="copyJournalBtn" onclick="copyJournalToClipboard()" style="margin-left: 1rem; background-color: #6A5ACD;">Copy to Clipboard</button>
+</div>
+
 
       <div id="upgradeBanner" style="text-align: center; margin-top: 2rem;">
         <p>Want more prompts and features? <strong>Unlock Summit Access</strong> today.</p>

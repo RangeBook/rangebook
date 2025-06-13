@@ -50,6 +50,53 @@ function getRandomPrompt(exclude = []) {
   const available = prompts.filter(p => !exclude.includes(p));
   return available.length > 0 ? available[Math.floor(Math.random() * available.length)] : prompts[0] || "No prompt available.";
 }
+function exportJournal() {
+  const entriesJSON = localStorage.getItem("journalEntries");
+  if (!entriesJSON) {
+    alert("No journal entries found.");
+    return;
+  }
+
+  const entries = JSON.parse(entriesJSON);
+  let textOutput = "";
+
+  for (const date in entries) {
+    textOutput += `Date: ${date}\n${entries[date]}\n\n`;
+  }
+
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  const blob = new Blob([textOutput], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `Rangebook-Journal-${today}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function copyJournalToClipboard() {
+  const entriesJSON = localStorage.getItem("journalEntries");
+  if (!entriesJSON) {
+    alert("No journal entries found.");
+    return;
+  }
+
+  const entries = JSON.parse(entriesJSON);
+  let textOutput = "";
+
+  for (const date in entries) {
+    textOutput += `Date: ${date}\n${entries[date]}\n\n`;
+  }
+
+  navigator.clipboard.writeText(textOutput).then(() => {
+    alert("Journal copied to clipboard.");
+  }).catch(err => {
+    console.error("Copy failed:", err);
+    alert("Failed to copy journal to clipboard.");
+  });
+}
 
 function showPrompt() {
   const prompt = getRandomPrompt();
