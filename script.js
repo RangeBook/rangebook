@@ -8,8 +8,12 @@ const MAX_SECOND_WINDS = 5;
 function getMonthlyPromptList() {
   const currentMonth = new Date().getMonth() + 1;
   const promptBank = JSON.parse(localStorage.getItem("rangebook-prompt-bank") || "{}");
-  return promptBank[currentMonth] || [];
+  const monthPrompts = promptBank[currentMonth] || [];
+
+  // Fix: If prompts are stored as objects (e.g. {text: "..."}), extract only the text
+  return monthPrompts.map(p => (typeof p === "string" ? p : p.text || "[Invalid prompt]"));
 }
+
 
 function getRandomPrompt(exclude = []) {
   const prompts = getMonthlyPromptList();
