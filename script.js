@@ -4,6 +4,21 @@ const isDevMode = true;
 let summitAccess = localStorage.getItem("rangebook-summit-access") === "true";
 let usedSecondWindCount = parseInt(localStorage.getItem("used-second-wind-count")) || 0;
 const MAX_SECOND_WINDS = 5;
+function updateSecondWindState() {
+  const btn = document.getElementById("secondPromptBtn");
+  if (!btn) return;
+  if (!summitAccess) {
+    btn.textContent = "Second Wind (Upgrade Required)";
+    btn.disabled = true;
+  } else if (usedSecondWindCount >= MAX_SECOND_WINDS) {
+    btn.textContent = "Second Wind (0 left)";
+    btn.disabled = true;
+  } else {
+    const remaining = MAX_SECOND_WINDS - usedSecondWindCount;
+    btn.textContent = `Second Wind (${remaining} left)`;
+    btn.disabled = false;
+  }
+}
 
 // === Month & Theme Setup ===
 const currentDate = new Date();
