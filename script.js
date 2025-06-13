@@ -98,6 +98,98 @@ function saveGoal() {
   localStorage.setItem("rangebook-monthly-goal", goal);
   document.getElementById("goalStatus").textContent = "Goal saved.";
 }
+const summitAccess = localStorage.getItem("summitAccess") === "true";
+const currentDate = new Date();
+const month = currentDate.getMonth() + 1;
+const year = currentDate.getFullYear();
+const day = currentDate.getDate();
+const currentMonthKey = `goal_${year}_${month}`;
+const personalGoalKey = `personal_goal_${year}_${month}`;
+const checkInKey = `checkin_${year}_${month}`;
+const reflectionKey = `reflection_${year}_${month}`;
+
+const monthlyThemes = {
+  1: "Discipline", 2: "Reflection", 3: "Decision-Making",
+  4: "Focus", 5: "Resilience", 6: "Growth",
+  7: "Responsibility", 8: "Presence", 9: "Leadership",
+  10: "Grit", 11: "Vision", 12: "Mastery"
+};
+
+const thisMonthTheme = monthlyThemes[month];
+
+// 🔹 Utility function to update the UI
+function displayGoal(goalText, elementId) {
+  const goalDisplay = document.getElementById(elementId);
+  if (goalDisplay) goalDisplay.textContent = goalText || "No goal set.";
+}
+
+// 🔹 Prompt for goal if not set
+function promptForGoals() {
+  if (!localStorage.getItem(currentMonthKey)) {
+    const goal = prompt(`This month's theme is ${thisMonthTheme}. Set one goal that puts it into action.`);
+    if (goal) localStorage.setItem(currentMonthKey, goal);
+  }
+
+  if (summitAccess && !localStorage.getItem(personalGoalKey)) {
+    const personal = prompt("Summit Access: Set a second personal goal for this month (optional).");
+    if (personal) localStorage.setItem(personalGoalKey, personal);
+  }
+}
+
+// 🔹 Mid-month check-in
+function midMonthCheckIn() {
+  if (summitAccess && day >= 14 && day <= 16 && !localStorage.getItem(checkInKey)) {
+    const checkIn = prompt(`Mid-month check-in: Are you on track with your goal for ${thisMonthTheme}?`);
+    if (checkIn) localStorage.setItem(checkInKey, checkIn);
+  }
+}
+
+// 🔹 End-of-month reflection
+function endOfMonthReflection() {
+  if (summitAccess && day >= 28 && !localStorage.getItem(reflectionKey)) {
+    const reflection = prompt(`End-of-month reflection: How well did you follow through on your goal for ${thisMonthTheme}?`);
+    if (reflection) localStorage.setItem(reflectionKey, reflection);
+  }
+}
+
+// 🔹 Display goals in UI
+function loadGoals() {
+  displayGoal(localStorage.getItem(currentMonthKey), "monthlyGoalDisplay");
+  if (summitAccess) {
+    displayGoal(localStorage.getItem(personalGoalKey), "personalGoalDisplay");
+  }
+}
+
+// 🔹 Edit goal functions
+function editGoal(key, promptText, displayId) {
+  const newGoal = prompt(promptText, localStorage.getItem(key) || "");
+  if (newGoal !== null) {
+    localStorage.setItem(key, newGoal);
+    displayGoal(newGoal, displayId);
+  }
+}
+
+// 🔹 Load archive
+function loadGoalArchive() {
+  const archive = document.getElementById("goalArchive");
+  if (archive && summitAccess) {
+    archive.innerHTML = "<strong>Past Goals:</strong><br>";
+    for (let m = 1; m <= 12; m++) {
+      const key = `goal_${year}_${m}`;
+      const goal = localStorage.getItem(key);
+      if (goal) {
+        archive.innerHTML += `🗓️ ${monthlyThemes[m]}: "${goal}"<br>`;
+      }
+    }
+  }
+}
+
+// Call everything on load
+promptForGoals();
+midMonthCheckIn();
+endOfMonthReflection();
+loadGoals();
+loadGoalArchive();
 
 window.onload = function () {
   const promptBank = localStorage.getItem("rangebook-prompt-bank");

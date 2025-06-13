@@ -23,6 +23,21 @@
       <p id="promptText">Loading prompt...</p>
 
       <p id="streakTracker" style="font-style: italic; color: #555; margin-bottom: 1rem; display: none;"></p>
+<!-- Monthly Goal System Start -->
+<div id="monthlyGoalContainer" style="margin-bottom: 1rem;">
+  <strong>Theme Goal:</strong>
+  <span id="monthlyGoalDisplay"></span>
+  <button onclick="editGoal(currentMonthKey, 'Update your monthly goal:', 'monthlyGoalDisplay')">✎</button>
+</div>
+
+<div id="personalGoalContainer" style="margin-bottom: 1rem;">
+  <strong>Personal Goal:</strong>
+  <span id="personalGoalDisplay"></span>
+  <button onclick="editGoal(personalGoalKey, 'Update your personal goal:', 'personalGoalDisplay')">✎</button>
+</div>
+
+<div id="goalArchive" style="margin-top: 1rem; font-size: 0.95rem;"></div>
+<!-- Monthly Goal System End -->
 
       <div id="bookmarkControls" style="margin: 0.5rem 0; display: none;">
         <button id="bookmarkButton">📌 Bookmark This Prompt</button>
