@@ -217,17 +217,19 @@ window.onload = function () {
   }
 
   const upgradeNowBtn = document.getElementById("upgradeNowBtn");
-  if (upgradeNowBtn) {
-    upgradeNowBtn.addEventListener("click", () => {
-      summitAccess = true;
-      localStorage.setItem("rangebook-summit-access", true);
-      localStorage.setItem("used-second-wind-count", 0);
-      document.getElementById("upgradeModal").style.display = "none";
-      showToast("Summit Access unlocked!");
-      updateSecondWindState();
-      location.reload();
-    });
-  }
+if (upgradeNowBtn) {
+  upgradeNowBtn.addEventListener("click", () => {
+    summitAccess = true;
+    usedSecondWindCount = 0; // ✅ In-memory reset
+    localStorage.setItem("rangebook-summit-access", true);
+    localStorage.setItem("used-second-wind-count", 0);
+    document.getElementById("upgradeModal").style.display = "none";
+    showToast("Summit Access unlocked!");
+    updateSecondWindState();
+    location.reload();
+  });
+}
+
 
   const cancelUpgradeBtn = document.getElementById("cancelUpgradeBtn");
   if (cancelUpgradeBtn) {
