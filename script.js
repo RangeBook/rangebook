@@ -51,7 +51,7 @@ function getRandomPrompt(exclude = []) {
   return available.length > 0 ? available[Math.floor(Math.random() * available.length)] : prompts[0] || "No prompt available.";
 }
 function exportJournal() {
-  const entriesJSON = localStorage.getItem("journalEntries");
+  const entriesJSON = localStorage.getItem("rangebook-history");
   if (!entriesJSON) {
     alert("No journal entries found.");
     return;
@@ -60,9 +60,10 @@ function exportJournal() {
   const entries = JSON.parse(entriesJSON);
   let textOutput = "";
 
-  for (const date in entries) {
-    textOutput += `Date: ${date}\n${entries[date]}\n\n`;
-  }
+  entries.forEach(item => {
+    const date = new Date(item.date).toLocaleDateString();
+    textOutput += `Date: ${date}\nPrompt: ${item.prompt}\nEntry: ${item.entry}\n\n`;
+  });
 
   const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
   const blob = new Blob([textOutput], { type: "text/plain" });
@@ -77,7 +78,7 @@ function exportJournal() {
 }
 
 function copyJournalToClipboard() {
-  const entriesJSON = localStorage.getItem("journalEntries");
+  const entriesJSON = localStorage.getItem("rangebook-history");
   if (!entriesJSON) {
     alert("No journal entries found.");
     return;
@@ -86,9 +87,10 @@ function copyJournalToClipboard() {
   const entries = JSON.parse(entriesJSON);
   let textOutput = "";
 
-  for (const date in entries) {
-    textOutput += `Date: ${date}\n${entries[date]}\n\n`;
-  }
+  entries.forEach(item => {
+    const date = new Date(item.date).toLocaleDateString();
+    textOutput += `Date: ${date}\nPrompt: ${item.prompt}\nEntry: ${item.entry}\n\n`;
+  });
 
   navigator.clipboard.writeText(textOutput).then(() => {
     alert("Journal copied to clipboard.");
