@@ -227,7 +227,6 @@ window.onload = function () {
   updateSecondWindState();
 
   if (summitAccess) {
-    document.getElementById("goalSection").style.display = "block";
     document.getElementById("exportSection").style.display = "block";
   }
 
