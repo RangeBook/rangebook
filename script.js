@@ -103,7 +103,7 @@ window.onload = function () {
   const promptBank = localStorage.getItem("rangebook-prompt-bank");
 
   if (!promptBank) {
-    fetch("prompts.json")
+    fetch("https://raw.githubusercontent.com/RangeBook/rangebook/main/prompts.json")
       .then(res => res.json())
       .then(data => {
         localStorage.setItem("rangebook-prompt-bank", JSON.stringify(data));
