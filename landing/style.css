@@ -92,3 +92,15 @@ ul {
   margin-top: 1rem;
   margin-bottom: 1rem;
 }
+.the-story {
+  background-color: #ede8df;
+  padding: 2.5rem;
+  margin: 2rem auto;
+  border-left: 6px solid #5a4636;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+.the-story h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
