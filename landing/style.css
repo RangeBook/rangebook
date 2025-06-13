@@ -1,4 +1,29 @@
 body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+h1, h2 {
+  font-family: Georgia, serif;
+  font-weight: bold;
+}
+
+section {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 2rem auto;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.final-cta {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+ul li {
+  margin-bottom: 0.5rem;
+}
+body {
   font-family: system-ui, sans-serif;
   background-color: #f3f1eb;
   color: #222;
@@ -52,4 +77,18 @@ ul {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
   margin: 1.5rem auto;
   display: block;
+}
+.email-signup {
+  text-align: center;
+  margin-top: 3rem;
+}
+
+.email-signup input[type="email"] {
+  padding: 0.75rem;
+  width: 80%;
+  max-width: 300px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
