@@ -179,6 +179,7 @@ window.onload = function () {
     const exp = document.getElementById("exportSection");
     if (exp) exp.style.display = "block";
   }
+updateSecondWindState();
 
   const reminderTime = document.getElementById("reminderTime");
   if (reminderTime) {
