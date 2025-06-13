@@ -11,7 +11,68 @@
   <meta name="author" content="Your Name" />
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <title>Rangebook</title>
-  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  #welcomeModal {
+    background: radial-gradient(circle at center, #222 0%, #111 100%);
+    color: #fff;
+    font-family: 'Merriweather', serif;
+    animation: fadeIn 0.8s ease-in-out forwards;
+    overflow-y: auto;
+    padding: 2rem;
+  }
+
+  #welcomeModal h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  #welcomeModal p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+
+  #welcomeModal img {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  }
+
+  #welcomeModal button {
+    background-color: #4b3621;
+    color: #fff;
+    padding: 0.75rem 2rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 2rem;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease-in-out;
+  }
+
+  #welcomeModal button:hover {
+    background-color: #3a2b1a;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="app-wrapper">
@@ -141,21 +202,23 @@
 
   <script src="script.js"></script>
 <!-- Welcome Modal with Image -->
-<div id="welcomeModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #111; color: #fff; z-index: 1000; display: flex; justify-content: center; align-items: center; text-align: center; padding: 1rem; box-sizing: border-box; overflow: auto;">
- <div style="margin: auto; max-width: 500px; padding: 1rem; padding-bottom: 5rem; word-wrap: break-word;">
-
-    <img src="rangebook-welcome.png" alt="Rangebook Leather Journal" style="width: 100%; max-width: 400px; border-radius: 8px; margin-bottom: 1.5rem;" />
-    <h1 style="font-size: 2rem; margin-bottom: 1rem;">Welcome to Rangebook</h1>
-    <p style="font-size: 1.1rem; line-height: 1.6;">
+<!-- Welcome Modal with Rugged Styling -->
+<div id="welcomeModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1000; display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center; box-sizing: border-box;">
+  <div style="width: 100%; max-width: 500px; padding-bottom: 6rem;">
+    <img src="rangebook-welcome.png" alt="Rangebook Leather Journal" />
+    <h1>Welcome to Rangebook</h1>
+    <p>
       Rangebook is a minimalist journaling tool for men who want clarity, discipline, and momentum.
       <br /><br />
       Each day, you'll get a single, high-impact prompt — nothing touchy-feely, just direction.
     </p>
-    <button onclick="dismissWelcome()" style="margin-top: 2rem; background-color: #fff; color: #111; padding: 0.75rem 1.5rem; font-weight: bold; border: none; border-radius: 6px; cursor: pointer;">
-      Let’s Begin
-    </button>
+    <p style="margin-top: 1.5rem; font-style: italic; font-size: 1rem; color: #bbb;">
+      A tool for men who move with intention.
+    </p>
+    <button onclick="dismissWelcome()">Let’s Begin</button>
   </div>
 </div>
+
 
 </body>
 </html>
