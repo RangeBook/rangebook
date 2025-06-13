@@ -272,3 +272,10 @@ select {
     width: 100%;
   }
 }
+.leather-subtitle {
+  font-size: 1rem;
+  font-style: italic;
+  color: #444;
+  margin-top: 0.25rem;
+  text-align: center;
+}
