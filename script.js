@@ -40,6 +40,16 @@ function updateSecondWindState() {
     btn.disabled = false;
   }
 }
+function updateBookmarkButton(prompt) {
+  const btn = document.getElementById("bookmarkButton");
+  const bookmarks = JSON.parse(localStorage.getItem("rangebook-bookmarks") || "[]");
+
+  if (bookmarks.includes(prompt)) {
+    btn.textContent = "❌ Remove Bookmark";
+  } else {
+    btn.textContent = "📌 Bookmark This Prompt";
+  }
+}
 
 function showPrompt() {
   const prompt = getRandomPrompt();
@@ -271,16 +281,6 @@ function loadBookmarkedPrompts() {
   }
 
   container.style.display = "block";
-}
-function updateBookmarkButton(prompt) {
-  const btn = document.getElementById("bookmarkButton");
-  const bookmarks = JSON.parse(localStorage.getItem("rangebook-bookmarks") || "[]");
-
-  if (bookmarks.includes(prompt)) {
-    btn.textContent = "❌ Remove Bookmark";
-  } else {
-    btn.textContent = "📌 Bookmark This Prompt";
-  }
 }
 
   document.getElementById("reminderTime").addEventListener("change", function () {
