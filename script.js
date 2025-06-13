@@ -211,6 +211,19 @@ function editGoal(storageKey, promptMessage, displayId) {
     showToast("Goal updated.");
   }
 }
+function dismissWelcome() {
+  const modal = document.getElementById("welcomeModal");
+  modal.style.display = "none";
+  localStorage.setItem("rangebook-seen-welcome", "true");
+}
+
+window.addEventListener("load", () => {
+  const hasSeenWelcome = localStorage.getItem("rangebook-seen-welcome");
+  if (!hasSeenWelcome) {
+    const modal = document.getElementById("welcomeModal");
+    if (modal) modal.style.display = "flex";
+  }
+});
 
 // === Event Listeners ===
 window.onload = function () {
