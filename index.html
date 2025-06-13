@@ -23,22 +23,6 @@
       <p id="promptText">Loading prompt...</p>
 
       <p id="streakTracker" style="font-style: italic; color: #555; margin-bottom: 1rem; display: none;"></p>
-<!-- Monthly Goal System Start -->
-<div id="monthlyGoalContainer" style="margin-bottom: 1rem;">
-  <strong>Theme Goal:</strong>
-  <span id="monthlyGoalDisplay"></span>
-  <button onclick="editGoal(currentMonthKey, 'Update your monthly goal:', 'monthlyGoalDisplay')">✎</button>
-</div>
-
-<div id="personalGoalContainer" style="margin-bottom: 1rem;">
-  <strong>Personal Goal:</strong>
-  <span id="personalGoalDisplay"></span>
-  <button onclick="editGoal(personalGoalKey, 'Update your personal goal:', 'personalGoalDisplay')">✎</button>
-</div>
-
-<div id="goalArchive" style="margin-top: 1rem; font-size: 0.95rem;"></div>
-<!-- Monthly Goal System End -->
-
       <div id="bookmarkControls" style="margin: 0.5rem 0; display: none;">
         <button id="bookmarkButton">📌 Bookmark This Prompt</button>
       </div>
@@ -55,7 +39,21 @@
         <button id="undoButton">Undo Prompt</button>
         <button id="resetButton" style="display: none;">Reset All</button>
       </div>
+<!-- Monthly Goal System Start -->
+<div id="monthlyGoalContainer" style="margin-bottom: 1rem;">
+  <strong>Theme Goal:</strong>
+  <span id="monthlyGoalDisplay"></span>
+  <button onclick="editGoal(currentMonthKey, 'Update your monthly goal:', 'monthlyGoalDisplay')">✎</button>
+</div>
 
+<div id="personalGoalContainer" style="margin-bottom: 1rem;">
+  <strong>Personal Goal:</strong>
+  <span id="personalGoalDisplay"></span>
+  <button onclick="editGoal(personalGoalKey, 'Update your personal goal:', 'personalGoalDisplay')">✎</button>
+</div>
+
+<div id="goalArchive" style="margin-top: 1rem; font-size: 0.95rem;"></div>
+<!-- Monthly Goal System End -->
       <p id="status"></p>
       <p id="goalReminder" style="color: darkorange; font-style: italic; display: none;"></p>
 
@@ -99,17 +97,17 @@
         </div>
       </div>
 
-      <div id="historyContainer" style="display: none; margin-top: 2rem;">
-        <h2>Journal History</h2>
-        <ul id="historyList"></ul>
-      </div>
-
+     
       <div id="bookmarkedContainer" style="display: none; margin-top: 2rem;">
         <h2>Bookmarked Prompts</h2>
         <ul id="bookmarkedList"></ul>
       </div>
 
-      <div id="exportSection" style="display: none; text-align: center; margin-top: 1rem;">
+      <div id="historyContainer" style="display: none; margin-top: 2rem;">
+        <h2>Journal History</h2>
+        <ul id="historyList"></ul>
+      </div>
+ <div id="exportSection" style="display: none; text-align: center; margin-top: 1rem;">
         <button id="exportJournalBtn" style="background-color: #4682B4;">Export My Journal (.txt)</button>
       </div>
 
