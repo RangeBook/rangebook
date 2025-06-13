@@ -202,20 +202,29 @@
 
   <script src="script.js"></script>
 
-<!-- Welcome Modal with Mobile-Safe Layout -->
-<div id="welcomeModal" style="display: none; position: fixed; inset: 0; background: radial-gradient(circle at center, #222 0%, #111 100%); color: #fff; z-index: 1000; font-family: 'Merriweather', serif; overflow-y: auto; padding: env(safe-area-inset-top, 1rem) 1rem env(safe-area-inset-bottom, 2rem); box-sizing: border-box;">
-  <div style="max-width: 500px; margin: 0 auto; text-align: center; min-height: 100vh; display: flex; flex-direction: column; justify-content: center;">
-    <img src="rangebook-welcome.png" alt="Rangebook Leather Journal" style="width: 100%; max-width: 400px; border-radius: 8px; margin-bottom: 1.5rem; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);" />
-    <h1 style="font-size: 2rem; margin-bottom: 1rem; font-weight: 700; letter-spacing: 0.5px;">Welcome to Rangebook</h1>
+<!-- Welcome Modal -->
+<div id="welcomeModal" style="position: fixed; inset: 0; background: radial-gradient(circle at center, #222 0%, #111 100%); color: #fff; z-index: 1000; overflow-y: auto; display: flex; align-items: center; justify-content: center; padding: env(safe-area-inset-top, 1.5rem) 1rem env(safe-area-inset-bottom, 2.5rem); box-sizing: border-box;">
+  <div style="max-width: 500px; width: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+
+    <!-- Responsive image that stays centered and uncropped -->
+    <img src="rangebook-welcome.png" alt="Rangebook Leather Journal" style="width: 100%; height: auto; max-width: 400px; border-radius: 8px; margin-bottom: 1.5rem; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);" />
+
+    <h1 style="font-size: 2rem; margin-bottom: 1rem; font-weight: 700;">Welcome to Rangebook</h1>
+
     <p style="font-size: 1.1rem; line-height: 1.6;">
       Rangebook is a minimalist journaling tool for men who want clarity, discipline, and momentum.
       <br /><br />
       Each day, you'll get a single, high-impact prompt — nothing touchy-feely, just direction.
     </p>
+
     <p style="margin-top: 1.5rem; font-style: italic; font-size: 1rem; color: #bbb;">
       A tool for men who move with intention.
     </p>
-    <button onclick="dismissWelcome()" style="margin-top: 2rem; background-color: #4b3621; color: #fff; padding: 0.75rem 2rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; border: none; border-radius: 8px; cursor: pointer; box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3); transition: all 0.2s ease-in-out;">
+
+    <!-- Spacer pushes button into visible area on all devices -->
+    <div style="height: 1rem;"></div>
+
+    <button onclick="dismissWelcome()" style="margin-top: 1rem; background-color: #4b3621; color: #fff; padding: 0.75rem 2rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; border: none; border-radius: 8px; cursor: pointer; box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3); transition: all 0.2s ease-in-out;">
       Let’s Begin
     </button>
   </div>
