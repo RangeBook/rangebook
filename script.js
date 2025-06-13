@@ -4,6 +4,7 @@ const isDevMode = true;
 let summitAccess = localStorage.getItem("rangebook-summit-access") === "true";
 let usedSecondWindCount = parseInt(localStorage.getItem("used-second-wind-count")) || 0;
 const MAX_SECOND_WINDS = 5;
+
 function updateSecondWindState() {
   const btn = document.getElementById("secondPromptBtn");
   if (!btn) return;
@@ -151,6 +152,17 @@ function showToast(message) {
   }, 2500);
 }
 
+function editGoal(storageKey, promptMessage, displayId) {
+  const currentValue = localStorage.getItem(storageKey) || "";
+  const newValue = prompt(promptMessage, currentValue);
+  if (newValue !== null) {
+    localStorage.setItem(storageKey, newValue);
+    const display = document.getElementById(displayId);
+    if (display) display.textContent = newValue;
+    showToast("Goal updated.");
+  }
+}
+
 // === Event Listeners ===
 window.onload = function () {
   const promptBank = localStorage.getItem("rangebook-prompt-bank");
@@ -170,6 +182,15 @@ window.onload = function () {
 
   showPrompt();
 
+  // Load and Display Goals
+  const goalText = localStorage.getItem(currentMonthKey) || "";
+  const goalDisplay = document.getElementById("monthlyGoalDisplay");
+  if (goalDisplay) goalDisplay.textContent = goalText;
+
+  const personalGoal = localStorage.getItem(personalGoalKey) || "";
+  const personalGoalDisplay = document.getElementById("personalGoalDisplay");
+  if (personalGoalDisplay) personalGoalDisplay.textContent = personalGoal;
+
   if (isDevMode) {
     const resetBtn = document.getElementById("resetButton");
     if (resetBtn) resetBtn.style.display = "inline-block";
@@ -179,7 +200,8 @@ window.onload = function () {
     const exp = document.getElementById("exportSection");
     if (exp) exp.style.display = "block";
   }
-updateSecondWindState();
+
+  updateSecondWindState();
 
   const reminderTime = document.getElementById("reminderTime");
   if (reminderTime) {
@@ -233,19 +255,17 @@ updateSecondWindState();
   }
 
   const upgradeNowBtn = document.getElementById("upgradeNowBtn");
-if (upgradeNowBtn) {
-  upgradeNowBtn.addEventListener("click", () => {
-    summitAccess = true;
-    usedSecondWindCount = 0; // ✅ In-memory reset
-    localStorage.setItem("rangebook-summit-access", true);
-    localStorage.setItem("used-second-wind-count", 0);
-    document.getElementById("upgradeModal").style.display = "none";
-    showToast("Summit Access unlocked!");
-    updateSecondWindState();
-    location.reload();
-  });
-}
-
+  if (upgradeNowBtn) {
+    upgradeNowBtn.addEventListener("click", () => {
+      summitAccess = true;
+      localStorage.setItem("rangebook-summit-access", true);
+      localStorage.setItem("used-second-wind-count", 0);
+      document.getElementById("upgradeModal").style.display = "none";
+      showToast("Summit Access unlocked!");
+      updateSecondWindState();
+      location.reload();
+    });
+  }
 
   const cancelUpgradeBtn = document.getElementById("cancelUpgradeBtn");
   if (cancelUpgradeBtn) {
