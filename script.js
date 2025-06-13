@@ -230,25 +230,29 @@ window.onload = function () {
   if (savedTime) {
     document.getElementById("reminderTime").value = savedTime;
   }
-document.getElementById("bookmarkButton").addEventListener("click", function () {
-  const prompt = document.getElementById("promptText").dataset.currentPrompt;
-  if (!prompt) return;
+const bookmarkBtn = document.getElementById("bookmarkButton");
+if (bookmarkBtn) {
+  bookmarkBtn.addEventListener("click", function () {
+    const prompt = document.getElementById("promptText").dataset.currentPrompt;
+    if (!prompt) return;
 
-  let bookmarks = JSON.parse(localStorage.getItem("rangebook-bookmarks") || "[]");
-  const index = bookmarks.indexOf(prompt);
+    let bookmarks = JSON.parse(localStorage.getItem("rangebook-bookmarks") || "[]");
+    const index = bookmarks.indexOf(prompt);
 
-  if (index === -1) {
-    bookmarks.push(prompt);
-    localStorage.setItem("rangebook-bookmarks", JSON.stringify(bookmarks));
-    showToast("Prompt bookmarked.");
-  } else {
-    bookmarks.splice(index, 1);
-    localStorage.setItem("rangebook-bookmarks", JSON.stringify(bookmarks));
-    showToast("Bookmark removed.");
-  }
+    if (index === -1) {
+      bookmarks.push(prompt);
+      localStorage.setItem("rangebook-bookmarks", JSON.stringify(bookmarks));
+      showToast("Prompt bookmarked.");
+    } else {
+      bookmarks.splice(index, 1);
+      localStorage.setItem("rangebook-bookmarks", JSON.stringify(bookmarks));
+      showToast("Bookmark removed.");
+    }
 
-  updateBookmarkButton(prompt);
-});
+    updateBookmarkButton(prompt);
+  });
+}
+
 function loadBookmarkedPrompts() {
   const container = document.getElementById("bookmarkedContainer");
   const list = document.getElementById("bookmarkedList");
@@ -305,7 +309,9 @@ function updateBookmarkButton(prompt) {
     location.reload();
   });
 
-  document.getElementById("upgradeNowBtn").addEventListener("click", function () {
+  const upgradeBtn = document.getElementById("upgradeNowBtn");
+if (upgradeBtn) {
+  upgradeBtn.addEventListener("click", function () {
     setSummitAccess(true);
     usedSecondWindCount = 0;
     localStorage.setItem("used-second-wind-count", 0);
@@ -314,6 +320,7 @@ function updateBookmarkButton(prompt) {
     updateSecondWindState();
     location.reload();
   });
+}
 
   document.getElementById("cancelUpgradeBtn").addEventListener("click", function () {
     document.getElementById("upgradeModal").style.display = "none";
