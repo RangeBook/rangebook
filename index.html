@@ -24,8 +24,9 @@
 
       <p id="streakTracker" style="font-style: italic; color: #555; margin-bottom: 1rem; display: none;"></p>
       <div id="bookmarkControls" style="margin: 0.5rem 0; display: none;">
-        <button id="bookmarkButton">📌 Bookmark This Prompt</button>
-      </div>
+  <button id="bookmarkButton">📌 Bookmark This Prompt</button>
+</div>
+
 
       <div style="position: relative; display: inline-block; width: 100%;">
         <textarea id="journalEntry" placeholder="Write your journal entry here..." style="width: 100%;"></textarea>
@@ -44,20 +45,22 @@
   <strong>Theme Goal:</strong>
   <span id="monthlyGoalDisplay"></span>
   <button
-    onclick="editGoal(currentMonthKey, 'Update your monthly goal:', 'monthlyGoalDisplay')"
-    style="font-size: 0.8rem; margin-left: 0.5rem; background: none; border: none; cursor: pointer; color: #888;"
-    title="Edit Theme Goal"
-  >✎</button>
+  onclick="editGoal(currentMonthKey, 'Update your monthly goal:', 'monthlyGoalDisplay')"
+  style="font-size: 1rem; margin-left: 0.5rem; background: none; border: none; cursor: pointer; color: #444;"
+  title="Edit Theme Goal"
+>✎</button>
+
 </div>
 
 <div id="personalGoalContainer" style="margin-bottom: 1rem;">
   <strong>Personal Goal:</strong>
   <span id="personalGoalDisplay"></span>
   <button
-    onclick="editGoal(personalGoalKey, 'Update your personal goal:', 'personalGoalDisplay')"
-    style="font-size: 0.8rem; margin-left: 0.5rem; background: none; border: none; cursor: pointer; color: #888;"
-    title="Edit Personal Goal"
-  >✎</button>
+  onclick="editGoal(personalGoalKey, 'Update your personal goal:', 'personalGoalDisplay')"
+  style="font-size: 1rem; margin-left: 0.5rem; background: none; border: none; cursor: pointer; color: #444;"
+  title="Edit Personal Goal"
+>✎</button>
+
 </div>
 
 <div id="goalArchive" style="margin-top: 1rem; font-size: 0.95rem;"></div>

@@ -46,6 +46,10 @@ function showPrompt() {
   document.getElementById("promptText").textContent = prompt;
   document.getElementById("promptText").dataset.currentPrompt = prompt;
   localStorage.setItem("last-prompt", prompt);
+document.getElementById("bookmarkControls").style.display = "block";
+const prompt = document.getElementById("promptText").dataset.currentPrompt;
+updateBookmarkButton(prompt);
+document.getElementById("bookmarkControls").style.display = "block";
 }
 
 function showToast(message) {
@@ -224,6 +228,54 @@ window.onload = function () {
   if (savedTime) {
     document.getElementById("reminderTime").value = savedTime;
   }
+document.getElementById("bookmarkButton").addEventListener("click", function () {
+  const prompt = document.getElementById("promptText").dataset.currentPrompt;
+  if (!prompt) return;
+
+  let bookmarks = JSON.parse(localStorage.getItem("rangebook-bookmarks") || "[]");
+  const index = bookmarks.indexOf(prompt);
+
+  if (index === -1) {
+    bookmarks.push(prompt);
+    localStorage.setItem("rangebook-bookmarks", JSON.stringify(bookmarks));
+    showToast("Prompt bookmarked.");
+  } else {
+    bookmarks.splice(index, 1);
+    localStorage.setItem("rangebook-bookmarks", JSON.stringify(bookmarks));
+    showToast("Bookmark removed.");
+  }
+
+  updateBookmarkButton(prompt);
+});
+function loadBookmarkedPrompts() {
+  const container = document.getElementById("bookmarkedContainer");
+  const list = document.getElementById("bookmarkedList");
+  const bookmarks = JSON.parse(localStorage.getItem("rangebook-bookmarks") || "[]");
+
+  list.innerHTML = "";
+
+  if (bookmarks.length === 0) {
+    list.innerHTML = "<li>No bookmarks yet.</li>";
+  } else {
+    bookmarks.forEach(p => {
+      const li = document.createElement("li");
+      li.textContent = p;
+      list.appendChild(li);
+    });
+  }
+
+  container.style.display = "block";
+}
+function updateBookmarkButton(prompt) {
+  const btn = document.getElementById("bookmarkButton");
+  const bookmarks = JSON.parse(localStorage.getItem("rangebook-bookmarks") || "[]");
+
+  if (bookmarks.includes(prompt)) {
+    btn.textContent = "❌ Remove Bookmark";
+  } else {
+    btn.textContent = "📌 Bookmark This Prompt";
+  }
+}
 
   document.getElementById("reminderTime").addEventListener("change", function () {
     const time = this.value;
@@ -275,4 +327,5 @@ window.onload = function () {
   document.getElementById("undoButton").addEventListener("click", undoPrompt);
   document.getElementById("saveGoalBtn").addEventListener("click", saveGoal);
   document.getElementById("toggleHistoryBtn").addEventListener("click", loadJournalHistory);
+document.getElementById("viewBookmarksBtn").addEventListener("click", loadBookmarkedPrompts);
 };
