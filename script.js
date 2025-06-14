@@ -338,8 +338,16 @@ window.onload = function () {
     });
   });
 
-  if (!summitAccess) {
-    const overdriveBtn = document.getElementById("overdriveBtn");
-    if (overdriveBtn) overdriveBtn.style.display = "none";
+ if (!summitAccess) {
+  const overdriveBtn = document.getElementById("overdriveBtn");
+  if (overdriveBtn) {
+    overdriveBtn.disabled = true;
+    overdriveBtn.classList.add("locked");
+    overdriveBtn.addEventListener("click", () => {
+      showToast("Overdrive is available with Summit Access.");
+      document.getElementById("upgradeModal").style.display = "flex";
+    });
   }
+}
+
 };

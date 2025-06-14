@@ -298,4 +298,8 @@ select {
   background-color: #3a3a3a;
   box-shadow: 0 0 10px #d4af3766;
 }
+.overdrive-btn.locked {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
