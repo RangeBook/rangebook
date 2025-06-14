@@ -26,10 +26,7 @@ const thisMonthTheme = monthlyThemes[month];
 function updateSecondWindState() {
   const btn = document.getElementById("secondPromptBtn");
   if (!btn) return;
-  if (!summitAccess) {
-    btn.textContent = "Second Wind (Upgrade Required)";
-    btn.disabled = true;
-  } else if (usedSecondWindCount >= MAX_SECOND_WINDS) {
+  if (usedSecondWindCount >= MAX_SECOND_WINDS) {
     btn.textContent = "Second Wind (0 left)";
     btn.disabled = true;
   } else {
@@ -38,6 +35,7 @@ function updateSecondWindState() {
     btn.disabled = false;
   }
 }
+
 
 function getMonthlyPromptList() {
   const promptBank = JSON.parse(localStorage.getItem("rangebook-prompt-bank") || "{}");
