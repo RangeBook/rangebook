@@ -4,7 +4,6 @@ const isDevMode = true;
 let summitAccess = localStorage.getItem("rangebook-summit-access") === "true";
 let usedSecondWindCount = parseInt(localStorage.getItem("used-second-wind-count")) || 0;
 const MAX_SECOND_WINDS = 1;
-const MAX_OVERDRIVES = 4;
 
 const currentDate = new Date();
 const month = currentDate.getMonth() + 1;
@@ -22,6 +21,21 @@ const monthlyThemes = {
   10: "Grit", 11: "Vision", 12: "Mastery"
 };
 const thisMonthTheme = monthlyThemes[month];
+// === Overdrive Usage Tracking ===
+const MAX_OVERDRIVES = 4;
+const TOTAL_OVERDRIVE_LIMIT = 1000;
+const overdriveDailyKey = `overdrive-${todayKey}`;
+const overdriveTotalKey = "rangebook-overdrive-total";
+
+function updateOverdriveCounter() {
+  const el = document.getElementById("overdriveCounter");
+  if (!el) return;
+
+  const dailyUsed = parseInt(localStorage.getItem(overdriveDailyKey) || "0");
+  const totalUsed = JSON.parse(localStorage.getItem(overdriveTotalKey) || "[]").length;
+
+  el.textContent = `Overdrive: ${dailyUsed}/${MAX_OVERDRIVES} today | ${totalUsed}/${TOTAL_OVERDRIVE_LIMIT} total`;
+}
 
 function updateSecondWindState() {
   const btn = document.getElementById("secondPromptBtn");
@@ -51,9 +65,10 @@ function getRandomFromList(prompts, exclude = []) {
 function showPrompt(type = "main") {
   const promptText = document.getElementById("promptText");
   const usedMainKey = `used-main-${todayKey}`;
-  const usedOverdriveKey = "used-overdrive-prompts";
+  const usedOverdriveKey = overdriveTotalKey;
 
   let prompt;
+
   if (type === "main") {
     const used = JSON.parse(localStorage.getItem(usedMainKey) || "[]");
     prompt = getRandomFromList(getMonthlyPromptList(), used);
@@ -77,13 +92,21 @@ function showPrompt(type = "main") {
     }
   } else if (type === "overdrive") {
     if (!summitAccess) return showToast("Upgrade required for Overdrive.");
-    const used = JSON.parse(localStorage.getItem(usedOverdriveKey) || "[]");
-    if (used.length >= MAX_OVERDRIVES) return showToast("Overdrive limit reached.");
-    prompt = getRandomFromList(getBonusPromptList(), used);
+
+    const dailyCount = parseInt(localStorage.getItem(overdriveDailyKey) || "0");
+    const totalUsed = JSON.parse(localStorage.getItem(overdriveTotalKey) || "[]");
+
+    if (dailyCount >= MAX_OVERDRIVES) return showToast("Overdrive limit reached today.");
+    if (totalUsed.length >= TOTAL_OVERDRIVE_LIMIT) return showToast("All Overdrive prompts used.");
+
+    const prompt = getRandomFromList(getBonusPromptList(), totalUsed);
     if (prompt) {
-      used.push(prompt);
-      localStorage.setItem(usedOverdriveKey, JSON.stringify(used));
+      totalUsed.push(prompt);
+      localStorage.setItem(overdriveDailyKey, `${dailyCount + 1}`);
+      localStorage.setItem(overdriveTotalKey, JSON.stringify(totalUsed));
     }
+
+    updateOverdriveCounter();
   }
 
   if (prompt) {
@@ -238,6 +261,28 @@ function dismissWelcome() {
   if (modal) modal.style.display = "none";
   localStorage.setItem("rangebook-seen-welcome", "true");
 }
+function saveMonthlyGoals() {
+  const themeVal = document.getElementById("goalInput").value.trim();
+  const personalVal = document.getElementById("personalGoalInput").value.trim();
+  localStorage.setItem(currentMonthKey, themeVal);
+  localStorage.setItem(personalGoalKey, personalVal);
+  document.getElementById("goalModal").style.display = "none";
+  showToast("Goals saved.");
+}
+
+function saveCheckIn() {
+  const val = document.getElementById("checkinInput").value.trim();
+  localStorage.setItem(checkInKey, val);
+  document.getElementById("checkinModal").style.display = "none";
+  showToast("Check-in saved.");
+}
+
+function saveReflection() {
+  const val = document.getElementById("reflectionInput").value.trim();
+  localStorage.setItem(reflectionKey, val);
+  document.getElementById("reflectionModal").style.display = "none";
+  showToast("Reflection saved.");
+}
 
 window.addEventListener("load", () => {
   const hasSeenWelcome = localStorage.getItem("rangebook-seen-welcome");
@@ -246,6 +291,10 @@ window.addEventListener("load", () => {
     if (modal) modal.style.display = "flex";
   }
 });
+function closeModal(el) {
+  const modal = el.closest('.modal');
+  if (modal) modal.style.display = 'none';
+}
 
 window.onload = function () {
   if (!localStorage.getItem("rangebook-prompt-bank") || !localStorage.getItem("rangebook-bonus-bank")) {
@@ -259,9 +308,24 @@ window.onload = function () {
 
     Promise.all([loadMonthly, loadBonus]).then(() => location.reload());
     return;
-  }
-
+   }
+ updateOverdriveCounter();
   showPrompt("main");
+const isFirstVisitThisMonth = !localStorage.getItem(`seen-goalmodal-${year}-${month}`);
+if (isFirstVisitThisMonth) {
+  document.getElementById("goalModal").style.display = "flex";
+  localStorage.setItem(`seen-goalmodal-${year}-${month}`, "true");
+}
+
+if (summitAccess && day === 15 && !localStorage.getItem(`seen-checkin-${year}-${month}`)) {
+  document.getElementById("checkinModal").style.display = "flex";
+  localStorage.setItem(`seen-checkin-${year}-${month}`, "true");
+}
+
+if (summitAccess && day >= 28 && !localStorage.getItem(`seen-reflection-${year}-${month}`)) {
+  document.getElementById("reflectionModal").style.display = "flex";
+  localStorage.setItem(`seen-reflection-${year}-${month}`, "true");
+}
 
   const goalText = localStorage.getItem(currentMonthKey) || "";
   const goalDisplay = document.getElementById("monthlyGoalDisplay");
