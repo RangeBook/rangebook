@@ -26,16 +26,11 @@ const thisMonthTheme = monthlyThemes[month];
 function updateSecondWindState() {
   const btn = document.getElementById("secondPromptBtn");
   if (!btn) return;
-  if (usedSecondWindCount >= MAX_SECOND_WINDS) {
-    btn.textContent = "Second Wind (0 left)";
-    btn.disabled = true;
-  } else {
-    const remaining = MAX_SECOND_WINDS - usedSecondWindCount;
-    btn.textContent = `Second Wind (${remaining} left)`;
-    btn.disabled = false;
-  }
+  
+  const remaining = MAX_SECOND_WINDS - usedSecondWindCount;
+  btn.textContent = `Second Wind (${remaining} left)`;
+  btn.disabled = remaining <= 0;
 }
-
 
 function getMonthlyPromptList() {
   const promptBank = JSON.parse(localStorage.getItem("rangebook-prompt-bank") || "{}");
