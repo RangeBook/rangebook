@@ -1,6 +1,6 @@
 // === Rangebook Core Script with Overdrive Integration (Merged with Original Functionality) ===
 
-const isDevMode = true;
+const isDevMode = false;
 let summitAccess = localStorage.getItem("rangebook-summit-access") === "true";
 let usedSecondWindCount = parseInt(localStorage.getItem("used-second-wind-count")) || 0;
 const MAX_SECOND_WINDS = 1;
@@ -99,12 +99,14 @@ function showPrompt(type = "main") {
     if (dailyCount >= MAX_OVERDRIVES) return showToast("Overdrive limit reached today.");
     if (totalUsed.length >= TOTAL_OVERDRIVE_LIMIT) return showToast("All Overdrive prompts used.");
 
-    const prompt = getRandomFromList(getBonusPromptList(), totalUsed);
-    if (prompt) {
-      totalUsed.push(prompt);
-      localStorage.setItem(overdriveDailyKey, `${dailyCount + 1}`);
-      localStorage.setItem(overdriveTotalKey, JSON.stringify(totalUsed));
-    }
+    prompt = getRandomFromList(getBonusPromptList(), totalUsed);
+if (prompt) {
+  totalUsed.push(prompt);
+  localStorage.setItem(overdriveDailyKey, `${dailyCount + 1}`);
+  localStorage.setItem(overdriveTotalKey, JSON.stringify(totalUsed));
+} else {
+  promptText.textContent = "No Overdrive prompt available.";
+}
 
     updateOverdriveCounter();
   }
@@ -313,7 +315,10 @@ window.onload = function () {
   showPrompt("main");
 const isFirstVisitThisMonth = !localStorage.getItem(`seen-goalmodal-${year}-${month}`);
 if (isFirstVisitThisMonth) {
-  document.getElementById("goalModal").style.display = "flex";
+  document.getElementById("goalInput").placeholder = `Set a goal for this month focused on ${thisMonthTheme}`;
+document.getElementById("personalGoalInput").placeholder = "Something you’d like to improve, build, or change this month.";
+document.getElementById("goalModal").style.display = "flex";
+
   localStorage.setItem(`seen-goalmodal-${year}-${month}`, "true");
 }
 
